@@ -157,17 +157,11 @@ def train(train_sets, dev_sets, test_sets, unlabeled_sets, fold):
                     # D accuracy
                     _, pred = torch.max(d_outputs, 1)
                     d_total += len(d_inputs)
-                    if opt.loss.lower() == 'l2':
-                        _, tgt_indices = torch.max(d_targets, 1)
-                        d_correct += (pred==tgt_indices).sum().item()
-                        l_d = functional.mse_loss(d_outputs, d_targets)                
-                        l_d.backward()
-                    else:
-                        d_correct += (pred==d_targets).sum().item()
-                        l_d = functional.nll_loss(d_outputs, d_targets)
-                        l_d = torch.sum(weight.view(-1, 1) * l_d / torch.sum(weight).detach().item())
-                        l_d.backward()
-                        loss_d[domain] = l_d.item()
+                    d_correct += (pred==d_targets).sum().item()
+                    l_d = functional.nll_loss(d_outputs, d_targets)
+                    l_d = torch.sum(weight.view(-1, 1) * l_d / torch.sum(weight).detach().item())
+                    l_d.backward()
+                    loss_d[domain] = l_d.item()
                 optimizerD.step()
             # F&C iteration
             utils.unfreeze_net(F_s)
@@ -220,18 +214,12 @@ def train(train_sets, dev_sets, test_sets, unlabeled_sets, fold):
                 weight = weight / torch.sum(weight).detach().item()
                 
                 d_outputs = D(shared_feat)
-                if opt.loss.lower() == 'gr':
-                    d_targets = utils.get_domain_label(opt.loss, domain, len(d_inputs))
-                    l_d = functional.nll_loss(d_outputs, d_targets)
-                    l_d = torch.sum(weight.view(-1, 1) * l_d / torch.sum(weight).detach().item())
-                    log.debug(f'D loss: {l_d.item()}')
-                    if opt.lambd > 0:
-                        l_d *= -opt.lambd
-                elif opt.loss.lower() == 'l2':
-                    d_targets = utils.get_random_domain_label(opt.loss, len(d_inputs))
-                    l_d = functional.mse_loss(d_outputs, d_targets)
-                    if opt.lambd > 0:
-                        l_d *= opt.lambd
+                d_targets = utils.get_domain_label(opt.loss, domain, len(d_inputs))
+                l_d = functional.nll_loss(d_outputs, d_targets)
+                l_d = torch.sum(weight.view(-1, 1) * l_d / torch.sum(weight).detach().item())
+                log.debug(f'D loss: {l_d.item()}')
+                if opt.lambd > 0:
+                    l_d *= -opt.lambd
                 l_d.backward()
             optimizer.step()
         # end of epoch
