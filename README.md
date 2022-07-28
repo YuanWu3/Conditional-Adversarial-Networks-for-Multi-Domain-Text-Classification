@@ -19,7 +19,7 @@ All the parameters are set as the same as parameters mentioned in the article. Y
 cd code/
 
 ```
-python train_man_exp1000.py --dataset prep-amazon --model mlp
+python train.py --dataset prep-amazon --model mlp
 ```
 
 ## Citation
