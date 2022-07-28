@@ -227,19 +227,12 @@ def train(train_sets, dev_sets, test_sets, unlabeled_sets, fold):
                     log.debug(f'D loss: {l_d.item()}')
                     if opt.lambd > 0:
                         l_d *= -opt.lambd
-                elif opt.loss.lower() == 'bs':
-                    d_targets = utils.get_random_domain_label(opt.loss, len(d_inputs))
-                    l_d = functional.kl_div(d_outputs, d_targets, size_average=False)
-                    if opt.lambd > 0:
-                        l_d *= opt.lambd
                 elif opt.loss.lower() == 'l2':
                     d_targets = utils.get_random_domain_label(opt.loss, len(d_inputs))
                     l_d = functional.mse_loss(d_outputs, d_targets)
                     if opt.lambd > 0:
                         l_d *= opt.lambd
                 l_d.backward()
-                if opt.model.lower() != 'lstm':
-                    log.debug(f'F_s norm: {F_s.net[-2].weight.grad.data.norm()}')
             optimizer.step()
         # end of epoch
         log.info('Ending epoch {}'.format(epoch+1))
