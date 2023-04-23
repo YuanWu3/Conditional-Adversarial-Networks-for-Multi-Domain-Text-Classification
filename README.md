@@ -26,7 +26,7 @@ python train.py --dataset prep-amazon --model mlp
 If you use this code for your research, consider citing:
 
 
-    @article{wu2020dual,
+    @article{wu2021conditional,
       title={Conditional Adversarial Networks for Multi-Domain Text Classification},
       author={Wu, Yuan and Inkpen, Diana and El-Roby, Ahmed},
       booktitle={Proceedings of the Second Workshop on Domain Adaptation for NLP},
